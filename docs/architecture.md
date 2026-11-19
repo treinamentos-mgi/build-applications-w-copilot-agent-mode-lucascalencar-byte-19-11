@@ -43,13 +43,13 @@ flowchart LR
 
 ## Decisões de implementação
 
-- **Camada de apresentação:** cada tela usa o cliente compartilhado para acessar `/api`; componentes cuidam da renderização e dos estados de carregamento, vazio e erro acessíveis. Regras de negócio ficam no backend.
-- **Camada de lógica:** rotas Express permanecem finas e delegam aos serviços validações, cálculos e consultas. Entradas inválidas ou recursos inexistentes retornam 4xx; erros internos não devem ser usados para representar validação.
-- **Camada de dados:** modelos Mongoose definem campos obrigatórios, tipos, limites e referências entre pessoas, equipes e atividades. O seed continua usando os modelos, é idempotente e preserva registros não relacionados existentes.
-- **Registro de atividades:** validar tipo, minutos e IDs de pessoa/equipe antes da gravação; confirmar que as referências existem; calcular pontos de forma determinística no serviço e definir `occurredAt` no servidor. Entradas inválidas não criam documentos.
-- **Gerenciamento de equipes:** exigir `name` (400 quando ausente), preservar `name` e `mascot` e manter `members` como lista de referências, vazia por padrão.
-- **Placar:** agregar os pontos das atividades por equipe, ordenar do maior total para o menor e atribuir posições começando em 1.
-- **Sugestões de treino:** localizar a pessoa pelo e-mail, usar sua meta e atividade recente para priorizar treinos de foco compatível e incluir uma justificativa; e-mail desconhecido retorna 4xx.
+- Decisão da camada de apresentação: cada tela usa o cliente compartilhado para acessar `/api`; componentes cuidam da renderização e dos estados de carregamento, vazio e erro acessíveis. Regras de negócio ficam no backend.
+- Decisão da camada de lógica: rotas Express permanecem finas e delegam aos serviços validações, cálculos e consultas. Entradas inválidas ou recursos inexistentes retornam 4xx; erros internos não devem ser usados para representar validação.
+- Decisão da camada de dados: modelos Mongoose definem campos obrigatórios, tipos, limites e referências entre pessoas, equipes e atividades. O seed continua usando os modelos, é idempotente e preserva registros não relacionados existentes.
+- Abordagem para registro de atividades: validar tipo, minutos e IDs de pessoa/equipe antes da gravação; confirmar que as referências existem; calcular pontos de forma determinística no serviço e definir `occurredAt` no servidor. Entradas inválidas não criam documentos.
+- Abordagem para gerenciamento de equipes: exigir `name` (400 quando ausente), preservar `name` e `mascot` e manter `members` como lista de referências, vazia por padrão.
+- Abordagem para o placar: agregar os pontos das atividades por equipe, ordenar do maior total para o menor e atribuir posições começando em 1.
+- Abordagem para sugestões de treino: localizar a pessoa pelo e-mail, usar sua meta e atividade recente para priorizar treinos de foco compatível e incluir uma justificativa; e-mail desconhecido retorna 4xx.
 
 ## Plano de testes
 
