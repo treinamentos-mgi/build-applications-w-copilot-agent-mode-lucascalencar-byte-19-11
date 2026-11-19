@@ -43,22 +43,21 @@ flowchart LR
 
 ## Decisões de implementação
 
-Registre seu plano aqui antes de editar o código.
-
-- Decisão da camada de apresentação:
-- Decisão da camada de lógica:
-- Decisão da camada de dados:
-- Abordagem para registro de atividades:
-- Abordagem para gerenciamento de equipes:
-- Abordagem para o placar:
-- Abordagem para sugestões de treino:
+- **Camada de apresentação:** cada tela usa o cliente compartilhado para acessar `/api`; componentes cuidam da renderização e dos estados de carregamento, vazio e erro acessíveis. Regras de negócio ficam no backend.
+- **Camada de lógica:** rotas Express permanecem finas e delegam aos serviços validações, cálculos e consultas. Entradas inválidas ou recursos inexistentes retornam 4xx; erros internos não devem ser usados para representar validação.
+- **Camada de dados:** modelos Mongoose definem campos obrigatórios, tipos, limites e referências entre pessoas, equipes e atividades. O seed continua usando os modelos, é idempotente e preserva registros não relacionados existentes.
+- **Registro de atividades:** validar tipo, minutos e IDs de pessoa/equipe antes da gravação; confirmar que as referências existem; calcular pontos de forma determinística no serviço e definir `occurredAt` no servidor. Entradas inválidas não criam documentos.
+- **Gerenciamento de equipes:** exigir `name` (400 quando ausente), preservar `name` e `mascot` e manter `members` como lista de referências, vazia por padrão.
+- **Placar:** agregar os pontos das atividades por equipe, ordenar do maior total para o menor e atribuir posições começando em 1.
+- **Sugestões de treino:** localizar a pessoa pelo e-mail, usar sua meta e atividade recente para priorizar treinos de foco compatível e incluir uma justificativa; e-mail desconhecido retorna 4xx.
 
 ## Plano de testes
 
-Registre os comandos executados e o significado de cada falha.
+Executar nesta ordem para validar cada dependência antes da seguinte:
 
-- Testes da camada de dados: `npm run test:data --prefix octofit-tracker/backend`
-- Testes da API: `npm run test:api --prefix octofit-tracker/backend`
-- Testes do frontend: `npm test --prefix octofit-tracker/frontend`
-- Compilação do backend: `npm run build --prefix octofit-tracker/backend`
-- Compilação do frontend: `npm run build --prefix octofit-tracker/frontend`
+- **Dados:** `npm run test:data --prefix octofit-tracker/backend` verifica validação dos modelos e seed idempotente. Só avançar quando os cinco testes passarem.
+- **API:** `npm run test:api --prefix octofit-tracker/backend` verifica validação e criação, relações das equipes, ordenação do placar e sugestões personalizadas. Só avançar quando os quatro testes passarem.
+- **Frontend:** `npm test --prefix octofit-tracker/frontend` verifica conteúdo das telas e estados acessíveis de carregamento, vazio e erro nas quatro rotas. Só avançar quando os 15 testes passarem.
+- **Builds finais:** `npm run build --prefix octofit-tracker/backend` e `npm run build --prefix octofit-tracker/frontend` verificam TypeScript e empacotamento do Vite.
+
+Linha de base observada em 2026-11-19: `npm test --prefix octofit-tracker/backend` teve 8 falhas e 1 aprovação (4 falhas de modelo e 4 de API; o seed passou). `npm test --prefix octofit-tracker/frontend` teve 15 falhas: conteúdo/dados das telas, solicitação de sugestões e estados de carregamento, vazio e erro. Cada etapa deve eliminar suas falhas antes de iniciar a próxima; uma regressão em outra camada exige repetir o conjunto correspondente.
